@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>電影配樂與情緒膠囊 | Cinematic Vibe & Sound Capsule</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Noto+Sans+TC:wght@300;400;500;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+        .font-serif-tc {
+            font-family: 'Noto Serif TC', serif;
+        }
+    </style>
+</head>
+<body class="bg-neutral-950 text-neutral-100 min-h-screen flex flex-col relative overflow-x-hidden">
+
+    <!-- 動態背景 Canvas -->
+    <canvas id="bgCanvas" class="fixed inset-0 pointer-events-none z-0 opacity-40"></canvas>
+
+    <!-- 頂部導覽列 -->
+    <header class="relative z-10 border-b border-neutral-800/60 backdrop-blur-md bg-neutral-950/70 sticky top-0">
+        <div class="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <span class="w-3 h-3 rounded-full bg-amber-500 animate-pulse"></span>
+                <h1 class="font-orbitron tracking-wider text-sm md:text-base font-bold text-neutral-200">CINEMATIC CAPSULE</h1>
+            </div>
+            <div class="text-xs text-neutral-400 font-mono" id="currentTime">--:--:--</div>
+        </div>
+    </header>
+
+    <!-- 主要內容區 -->
+    <main class="relative z-10 max-w-4xl mx-auto px-6 py-10 flex-grow w-full space-y-10">
+
+        <!-- 標題區 -->
+        <section class="text-center space-y-3">
+            <h2 class="text-3xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-neutral-100 via-neutral-300 to-neutral-500 bg-clip-text text-transparent">
+                捕捉你的當下心境
+            </h2>
+            <p class="text-neutral-400 text-sm md:text-base max-w-lg mx-auto">
+                選擇經典電影氛圍，聆聽熟悉優美的和弦旋律，並封存專屬於你的電影海報卡片。
+            </p>
+        </section>
+
+        <!-- 情境選擇區 (Vibe Selector) -->
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- 模式 1 -->
+            <button onclick="setVibe('interstellar')" id="btn-interstellar" class="vibe-btn text-left p-6 rounded-2xl border border-neutral-800 bg-neutral-900/50 hover:bg-neutral-900 transition-all duration-300 group relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div class="relative z-10 space-y-2">
+                    <span class="text-xs font-mono uppercase tracking-widest text-indigo-400">Mode 01</span>
+                    <h3 class="text-lg font-bold font-orbitron text-neutral-100">星際漫遊</h3>
+                    <p class="text-xs text-neutral-400 leading-relaxed">深邃唯美的鋼琴琶音，適合深夜獨處與靈感沉澱。</p>
+                </div>
+            </button>
+
+            <!-- 模式 2 -->
+            <button onclick="setVibe('dawn')" id="btn-dawn" class="vibe-btn text-left p-6 rounded-2xl border border-neutral-800 bg-neutral-900/50 hover:bg-neutral-900 transition-all duration-300 group relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div class="relative z-10 space-y-2">
+                    <span class="text-xs font-mono uppercase tracking-widest text-amber-400">Mode 02</span>
+                    <h3 class="text-lg font-bold font-orbitron text-neutral-100">破曉曙光</h3>
+                    <p class="text-xs text-neutral-400 leading-relaxed">充滿希望的明亮和弦，迎向充滿可能的新一天。</p>
+                </div>
+            </button>
+
+            <!-- 模式 3 -->
+            <button onclick="setVibe('midnight')" id="btn-midnight" class="vibe-btn text-left p-6 rounded-2xl border border-neutral-800 bg-neutral-900/50 hover:bg-neutral-900 transition-all duration-300 group relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div class="relative z-10 space-y-2">
+                    <span class="text-xs font-mono uppercase tracking-widest text-emerald-400">Mode 03</span>
+                    <h3 class="text-lg font-bold font-orbitron text-neutral-100">深夜思緒</h3>
+                    <p class="text-xs text-neutral-400 leading-relaxed">溫暖低沉的療癒旋律，陪伴每一個安靜的時刻。</p>
+                </div>
+            </button>
+
+            <!-- 模式 4 -->
+            <button onclick="setVibe('festival')" id="btn-festival" class="vibe-btn text-left p-6 rounded-2xl border border-neutral-800 bg-neutral-900/50 hover:bg-neutral-900 transition-all duration-300 group relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-br from-rose-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div class="relative z-10 space-y-2">
+                    <span class="text-xs font-mono uppercase tracking-widest text-rose-400">Mode 04</span>
+                    <h3 class="text-lg font-bold font-orbitron text-neutral-100">夏日慶典</h3>
+                    <p class="text-xs text-neutral-400 leading-relaxed">輕快跳躍的派對節奏，捕捉生活中每一刻歡笑。</p>
+                </div>
+            </button>
+
+            <!-- 模式 5 -->
+            <button onclick="setVibe('anthem')" id="btn-anthem" class="vibe-btn text-left p-6 rounded-2xl border border-neutral-800 bg-neutral-900/50 hover:bg-neutral-900 transition-all duration-300 group relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div class="relative z-10 space-y-2">
+                    <span class="text-xs font-mono uppercase tracking-widest text-orange-400">Mode 05</span>
+                    <h3 class="text-lg font-bold font-orbitron text-neutral-100">英雄崛起</h3>
+                    <p class="text-xs text-neutral-400 leading-relaxed">大氣磅礡的史詩和弦，挑戰自我時的最強應援。</p>
+                </div>
+            </button>
+        </section>
+
+        <!-- 播放控制與視覺化面板 -->
+        <section class="border border-neutral-800 bg-neutral-900/30 backdrop-blur rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="space-y-1 text-center md:text-left">
+                <div class="text-xs text-neutral-500 font-mono uppercase">Current Vibe</div>
+                <div id="currentVibeTitle" class="text-xl font-bold font-orbitron text-neutral-200">請選擇上方情境</div>
+                <div id="currentVibeDesc" class="text-xs text-neutral-400">點擊任意模式以啟動合成配樂與光影</div>
+            </div>
+            <button onclick="toggleAudio()" id="audioToggleBtn" disabled class="px-6 py-3 rounded-xl bg-neutral-800 text-neutral-400 font-medium text-sm transition-all flex items-center space-x-2 cursor-not-allowed">
+                <svg id="playIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span id="audioBtnText">等待選擇情境</span>
+            </button>
+        </section>
+
+        <!-- 情緒膠囊日記產生器 (支援真實電影海報背景與風格) -->
+        <section class="border border-neutral-800 bg-neutral-900/30 backdrop-blur rounded-2xl p-6 md:p-8 space-y-6">
+            <div class="space-y-2">
+                <h3 class="text-lg font-bold font-orbitron flex items-center space-x-2">
+                    <span>🎬 電影海報情緒膠囊</span>
+                </h3>
+                <p class="text-xs text-neutral-400">寫下你的今日心境，並選擇一款經典電影海報風格背景，一鍵生成質感海報卡片！</p>
+            </div>
+
+            <div class="space-y-4">
+                <textarea id="diaryInput" rows="3" placeholder="例如：在星空下找回了最初的夢想，這一刻感覺自己就是主角..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-4 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-neutral-600 transition-colors resize-none"></textarea>
+                
+                <!-- 海報背景風格選擇 -->
+                <div class="space-y-2">
+                    <label class="text-xs font-mono text-neutral-400">選擇電影海報視覺風格：</label>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <label class="cursor-pointer border border-neutral-800 rounded-xl p-3 bg-neutral-900/50 hover:border-neutral-600 flex items-center space-x-2">
+                            <input type="radio" name="posterBg" value="interstellar" checked class="text-amber-500 focus:ring-0">
+                            <span class="text-xs font-medium">🌌 星際深淵黑</span>
+                        </label>
+                        <label class="cursor-pointer border border-neutral-800 rounded-xl p-3 bg-neutral-900/50 hover:border-neutral-600 flex items-center space-x-2">
+                            <input type="radio" name="posterBg" value="sunset" class="text-amber-500 focus:ring-0">
+                            <span class="text-xs font-medium">🌇 暮光膠卷金</span>
+                        </label>
+                        <label class="cursor-pointer border border-neutral-800 rounded-xl p-3 bg-neutral-900/50 hover:border-neutral-600 flex items-center space-x-2">
+                            <input type="radio" name="posterBg" value="vintage" class="text-amber-500 focus:ring-0">
+                            <span class="text-xs font-medium">📜 復古文藝白</span>
+                        </label>
+                        <label class="cursor-pointer border border-neutral-800 rounded-xl p-3 bg-neutral-900/50 hover:border-neutral-600 flex items-center space-x-2">
+                            <input type="radio" name="posterBg" value="cyber" class="text-amber-500 focus:ring-0">
+                            <span class="text-xs font-medium">⚡ 賽博霓虹紫</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button onclick="generatePoster()" class="w-full py-3 rounded-xl bg-neutral-100 text-neutral-950 font-bold text-sm hover:bg-neutral-200 transition-colors shadow-lg">
+                    生成精緻電影海報
+                </button>
+            </div>
+
+            <!-- 海報預覽卡片輸出區 (真實電影海報排版風格) -->
+            <div id="posterCard" class="hidden relative border-4 border-neutral-800 bg-neutral-950 rounded-2xl p-8 md:p-12 space-y-8 overflow-hidden shadow-2xl transition-all">
+                <!-- 裝飾性光影背景 -->
+                <div id="posterBgGlow" class="absolute inset-0 bg-gradient-to-tr from-indigo-950/40 via-transparent to-neutral-900/50 pointer-events-none"></div>
+                
+                <div class="relative z-10 flex justify-between items-center border-b border-neutral-800/80 pb-4">
+                    <div>
+                        <span class="font-orbitron text-xs tracking-widest text-amber-400 uppercase block" id="posterVibeTag">VIBE</span>
+                        <span class="text-[10px] font-mono text-neutral-500">FEATURE FILM CAPSULE</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs font-mono text-neutral-400 block" id="posterDate">2026.10.19</span>
+                        <span class="text-[10px] font-mono text-neutral-600">DIRECTED BY YOU</span>
+                    </div>
+                </div>
+
+                <!-- 海報金句內容 -->
+                <div class="relative z-10 py-6 text-center space-y-4">
+                    <span class="text-amber-500/60 text-2xl font-serif">“</span>
+                    <blockquote class="text-xl md:text-2xl font-serif-tc font-medium text-neutral-100 italic leading-relaxed px-4" id="posterText">
+                        "..."
+                    </blockquote>
+                    <span class="text-amber-500/60 text-2xl font-serif">”</span>
+                </div>
+
+                <div class="relative z-10 flex justify-between items-end pt-4 border-t border-neutral-800/80">
+                    <div>
+                        <div class="text-[10px] text-neutral-500 font-mono tracking-wider">SOUNDTRACK & ATMOSPHERE</div>
+                        <div class="text-xs font-bold text-neutral-300 font-orbitron">ORIGINAL MOTION PICTURE CAPSULE</div>
+                    </div>
+                    <button onclick="copyPosterText()" class="px-4 py-2 rounded-lg bg-neutral-800/80 hover:bg-neutral-700 text-xs text-amber-300 font-mono transition-colors">
+                        複製金句文字
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="relative z-10 border-t border-neutral-900 py-6 text-center text-xs text-neutral-600 font-mono">
+        Cinematic Vibe & Sound Capsule • Built with Vibe Coding
+    </footer>
+
+    <!-- JavaScript 邏輯 -->
+    <script>
+        // 即時時鐘
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = now.toTimeString().split(' ')[0];
+        }, 1000);
+
+        // 背景 Canvas 動畫
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let currentVibeType = 'interstellar';
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2.5 + 0.5;
+                this.speedX = (Math.random() - 0.5) * (currentVibeType === 'anthem' ? 1.2 : 0.4);
+                this.speedY = (Math.random() - 0.5) * (currentVibeType === 'anthem' ? 1.2 : 0.4);
+                this.alpha = Math.random() * 0.6 + 0.1;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+                    this.reset();
+                }
+            }
+            draw() {
+                ctx.fillStyle = currentVibeType === 'interstellar' ? `rgba(99, 102, 241, ${this.alpha})` :
+                                currentVibeType === 'dawn' ? `rgba(245, 158, 11, ${this.alpha})` :
+                                currentVibeType === 'midnight' ? `rgba(16, 185, 129, ${this.alpha})` :
+                                currentVibeType === 'festival' ? `rgba(244, 63, 94, ${this.alpha})` :
+                                `rgba(249, 115, 22, ${this.alpha})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 70; i++) particles.push(new Particle());
+
+        function animateCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateCanvas);
+        }
+        animateCanvas();
+
+        // Web Audio API 經典流暢和弦進展
+        let audioCtx = null;
+        let isPlaying = false;
+        let chordInterval = null;
+
+        const vibes = {
+            interstellar: {
+                title: "《星際漫遊》 (Interstellar Space)",
+                desc: "經典唯美的流行與電影鋼琴和弦進行。",
+                tag: "INTERSTELLAR VIBE",
+                chords: [
+                    [220.00, 261.63, 329.63], // Am
+                    [174.61, 220.00, 261.63], // F
+                    [130.81, 164.81, 196.00], // C
+                    [196.00, 246.94, 293.66]  // G
+                ],
+                speed: 2400,
+                wave: 'sine'
+            },
+            dawn: {
+                title: "《破曉曙光》 (Dawn Awakening)",
+                desc: "充滿希望與明亮感的溫暖大調和弦。",
+                tag: "DAWN AWAKENING",
+                chords: [
+                    [261.63, 329.63, 392.00], // C
+                    [220.00, 261.63, 329.63], // Am
+                    [174.61, 220.00, 261.63], // F
+                    [196.00, 246.94, 329.63]  // G
+                ],
+                speed: 2200,
+                wave: 'sine'
+            },
+            midnight: {
+                title: "《深夜思緒》 (Midnight Reflection)",
+                desc: "低沉溫暖、帶有Lo-Fi質感的爵士和弦。",
+                tag: "MIDNIGHT REFLECTION",
+                chords: [
+                    [146.83, 174.61, 220.00], // Dm7
+                    [116.54, 146.83, 174.61], // Bb
+                    [164.81, 196.00, 246.94], // Em
+                    [130.81, 164.81, 220.00]  // Am
+                ],
+                speed: 2600,
+                wave: 'triangle'
+            },
+            festival: {
+                title: "《夏日慶典》 (Summer Festival)",
+                desc: "輕快活潑、充滿陽光氣息的跳躍和弦。",
+                tag: "SUMMER FESTIVAL",
+                chords: [
+                    [261.63, 329.63, 392.00], // C
+                    [196.00, 246.94, 293.66], // G
+                    [220.00, 261.63, 329.63], // Am
+                    [174.61, 220.00, 261.63]  // F
+                ],
+                speed: 1600,
+                wave: 'triangle'
+            },
+            anthem: {
+                title: "《英雄崛起》 (Epic Anthem)",
+                desc: "大氣磅礡、史詩感十足的交響銅管和弦。",
+                tag: "EPIC ANTHEM",
+                chords: [
+                    [130.81, 196.00, 261.63], // C Power
+                    [174.61, 261.63, 349.23], // F Power
+                    [116.54, 174.61, 233.08], // Bb Power
+                    [146.83, 220.00, 293.66]  // Dm Power
+                ],
+                speed: 2000,
+                wave: 'sawtooth'
+            }
+        };
+
+        function setVibe(type) {
+            currentVibeType = type;
+            const vibe = vibes[type];
+
+            document.getElementById('currentVibeTitle').textContent = vibe.title;
+            document.getElementById('currentVibeDesc').textContent = vibe.desc;
+            
+            const btn = document.getElementById('audioToggleBtn');
+            btn.disabled = false;
+            btn.classList.remove('bg-neutral-800', 'text-neutral-400', 'cursor-not-allowed');
+            btn.classList.add('bg-neutral-100', 'text-neutral-950', 'hover:bg-neutral-200');
+            document.getElementById('audioBtnText').textContent = isPlaying ? "暫停配樂" : "開始播放合成配樂";
+
+            document.querySelectorAll('.vibe-btn').forEach(b => b.classList.remove('border-neutral-400', 'bg-neutral-900'));
+            document.getElementById(`btn-${type}`).classList.add('border-neutral-400', 'bg-neutral-900');
+
+            particles.forEach(p => p.reset());
+
+            if (isPlaying) {
+                stopSynth();
+                startSynth();
+            }
+        }
+
+        function toggleAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            if (isPlaying) {
+                stopSynth();
+                isPlaying = false;
+                document.getElementById('audioBtnText').textContent = "開始播放合成配樂";
+            } else {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                startSynth();
+                isPlaying = true;
+                document.getElementById('audioBtnText').textContent = "暫停配樂";
+            }
+        }
+
+        let chordIndex = 0;
+        function playChordProgression() {
+            if (!audioCtx || !isPlaying) return;
+            const vibe = vibes[currentVibeType];
+            const currentChord = vibe.chords[chordIndex];
+            chordIndex = (chordIndex + 1) % vibe.chords.length;
+
+            currentChord.forEach((freq, i) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = vibe.wave;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime + (i * 0.08)); // 稍微錯開製造琶音感
+
+                const vol = currentVibeType === 'anthem' ? 0.06 : 0.09;
+                gain.gain.setValueAtTime(0, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(vol, audioCtx.currentTime + 0.3);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 2.2);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start(audioCtx.currentTime + (i * 0.08));
+                osc.stop(audioCtx.currentTime + 2.5);
+            });
+        }
+
+        function startSynth() {
+            playChordProgression();
+            const speed = vibes[currentVibeType].speed;
+            chordInterval = setInterval(playChordProgression, speed);
+        }
+
+        function stopSynth() {
+            if (chordInterval) {
+                clearInterval(chordInterval);
+                chordInterval = null;
+            }
+            chordIndex = 0;
+        }
+
+        // 生成真實電影海報風格卡片
+        function generatePoster() {
+            const text = document.getElementById('diaryInput').value.trim();
+            if (!text) {
+                alert('請先輸入一些今天的心情獨白或筆記喔！');
+                return;
+            }
+
+            const vibe = vibes[currentVibeType];
+            document.getElementById('posterText').textContent = `"${text}"`;
+            document.getElementById('posterVibeTag').textContent = vibe.tag;
+            
+            const today = new Date();
+            const dateStr = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
+            document.getElementById('posterDate').textContent = dateStr;
+
+            // 取得選擇的海報背景風格
+            const bgStyle = document.querySelector('input[name="posterBg"]:checked').value;
+            const card = document.getElementById('posterCard');
+            const glow = document.getElementById('posterBgGlow');
+
+            // 根據選擇切換海報背景色系
+            card.className = "relative border-4 rounded-2xl p-8 md:p-12 space-y-8 overflow-hidden shadow-2xl transition-all ";
+            if (bgStyle === 'interstellar') {
+                card.classList.add('border-indigo-900', 'bg-neutral-950');
+                glow.className = "absolute inset-0 bg-gradient-to-tr from-indigo-950/60 via-blue-950/20 to-neutral-950 pointer-events-none";
+            } else if (bgStyle === 'sunset') {
+                card.classList.add('border-amber-900/60', 'bg-stone-950');
+                glow.className = "absolute inset-0 bg-gradient-to-tr from-amber-950/50 via-orange-950/20 to-stone-950 pointer-events-none";
+            } else if (bgStyle === 'vintage') {
+                card.classList.add('border-neutral-700', 'bg-neutral-900');
+                glow.className = "absolute inset-0 bg-gradient-to-tr from-neutral-800/40 via-neutral-900 to-neutral-950 pointer-events-none";
+            } else {
+                card.classList.add('border-purple-900/60', 'bg-slate-950');
+                glow.className = "absolute inset-0 bg-gradient-to-tr from-purple-950/50 via-rose-950/20 to-slate-950 pointer-events-none";
+            }
+
+            card.classList.remove('hidden');
+            card.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function copyPosterText() {
+            const text = document.getElementById('posterText').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('已成功複製海報金句！');
+            });
+        }
+    </script>
+</body>
+</html>
